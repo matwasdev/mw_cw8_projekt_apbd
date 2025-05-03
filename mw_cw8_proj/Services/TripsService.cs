@@ -10,7 +10,8 @@ public class TripsService : ITripsService
     public async Task<List<TripDTO>> GetTripsAsync()
     {
         var trips = new List<TripDTO>();
-
+        
+        //To zapytanie zwraca wszystkie wycieczki w bazie danych wraz z ich krajami (oczywiscie osobno)
         var cmdText = @"select T.IdTrip as TIdTrip, T.Name as TName,Description,DateFrom,DateTo,MaxPeople,C.IdCountry as CIdCountry, C.Name  as CName from Trip T join Country_Trip CT on CT.IdTrip=T.IdTrip
                         Join Country C on C.IdCountry = CT.IdCountry;";
 

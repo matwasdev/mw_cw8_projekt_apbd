@@ -19,6 +19,8 @@ public class ClientsController : ControllerBase
     }
 
     
+    // Ten endpoint pobiera wszystkie wycieczki związane z konkretnym klientem (lub pustą listę jeśli zadnej nie ma)
+    // Dodatkowo zwracane sa rowniez informacje o rejestracji oraz platnosci
     [HttpGet("{id}/trips")]
     public async Task<ActionResult> GetClientTripsAsync(int id)
     {
@@ -42,7 +44,9 @@ public class ClientsController : ControllerBase
             return StatusCode(500, "Internal server error occured");
         }
     }
-
+    
+    
+    //Ten endpoint tworzy nowy rekord klienta i zwraca wygenerowane przez baze danych id.
     [HttpPost]
     public async Task<ActionResult> CreateClientAsync(CreateClientDTO client)
     {
@@ -68,6 +72,8 @@ public class ClientsController : ControllerBase
         }
     }
 
+    
+    // Ten endpoint rejestruje klienta na konkretna wycieczke (jesli taki klient i taka wycieczka istnieja)
     [HttpPut("{id}/trips/{tripId}")]
     public async Task<ActionResult> RegisterClientForTripAsync(int id,int tripId)
     {
@@ -98,6 +104,8 @@ public class ClientsController : ControllerBase
         }
     }
     
+    
+    //Ten endpoint usuwa rejestracje klienta z wycieczki ( pod warunkiem, ze takowa istnieje )
     [HttpDelete("{id}/trips/{tripId}")]
     public async Task<ActionResult> DeleteClientFromTripAsync(int id, int tripId)
     {

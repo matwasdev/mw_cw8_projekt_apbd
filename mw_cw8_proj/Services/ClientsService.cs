@@ -15,6 +15,7 @@ public class ClientsService : IClientsService
     {
         var clientTrips = new List<TripPaymentDTO>();
         
+        // To zapytanie ma zwracać wszystkie wycieczki (wszystkie szczegoly tych wycieczek) wraz z dolaczona informacja o ich platnosci oraz rejestracji dla klienta o danym IdClient
         var query = @"SELECT T.IdTrip as TIdTrip, T.Name as TName,  T.Description as TDescription, T.DateFrom as TDateFrom, T.DateTo as TDateTo, T.MaxPeople as TMaxPeople, CT.PaymentDate as CTPaymentDate, CT.RegisteredAt as CTRegisteredAt FROM CLIENT C JOIN CLIENT_TRIP CT ON C.IdClient=CT.IdClient 
                         JOIN TRIP T ON T.IdTrip=CT.IdTrip WHERE C.IdClient=@IdClient";
 
@@ -22,7 +23,7 @@ public class ClientsService : IClientsService
         {
             await sqlConnection.OpenAsync();
             
-            
+            // To zapytanie sprawdza czy klient o danym IdClient istnieje w bazie danych
             using (var checkIdCmd = new SqlCommand("SELECT 1 FROM CLIENT WHERE IdClient = @IdClient", sqlConnection))
             {
                 checkIdCmd.Parameters.AddWithValue("@IdClient", id);
@@ -79,6 +80,7 @@ public class ClientsService : IClientsService
     
     public async Task<int> CreateClientAsync(CreateClientDTO client)
     {
+        // To zapytanie wprowadza nowego klienta do bazy danych oraz odczytuje od razu jego wygenerowane ID
         var query = @"INSERT INTO Client (FirstName, LastName, Email, Telephone, Pesel)
                   VALUES (@FirstName, @LastName, @Email, @Telephone, @Pesel);
                   SELECT SCOPE_IDENTITY();
@@ -110,7 +112,7 @@ public class ClientsService : IClientsService
         {
             await sqlConnection.OpenAsync();
 
-
+            // To zapytanie sprawdza czy klient o danym IdClient istnieje w bazie danych
             using (var checkIdCmd = new SqlCommand("SELECT 1 FROM CLIENT WHERE IdClient = @IdClient",sqlConnection))
             {
                 checkIdCmd.Parameters.AddWithValue("@IdClient", id);
@@ -122,7 +124,7 @@ public class ClientsService : IClientsService
                 }
             }
             
-            
+            //To zapytanie sprowadza ilosc osob (count(*)) zarejestrowanych na dana wycieczke (IdTrip) oraz maksymalna ilosc osob, ktora moze byc zarejestrowana na ta wycieczke
             using (var checkTripIdCmd = new SqlCommand("select count(*),T.MaxPeople from Client_Trip CT join TRIP T on T.IdTrip=CT.IdTrip where T.IdTrip=@IdTrip group by T.MaxPeople", sqlConnection))
             {
                 checkTripIdCmd.Parameters.AddWithValue("@IdTrip", tripId);
@@ -146,7 +148,7 @@ public class ClientsService : IClientsService
                 }
             }
 
-            
+            //To zapytanie wstawia rekord do tabeli Client_Trip z biezaca data jako RegisteredAt. 
             using (var registerClientCmd = new SqlCommand("INSERT INTO Client_Trip(IdClient,IdTrip,RegisteredAt,PaymentDate) Values (@IdClient, @IdTrip, @CurrentDate, null)", sqlConnection))
             {
                 DateTime currentDate = DateTime.Now;
@@ -167,6 +169,7 @@ public class ClientsService : IClientsService
         {
             await sqlConnection.OpenAsync();
             
+            //To zapytanie sprawdza czy istnieje klient (IdClient) zarejestrowany na wycieczke (IdTrip)
             using (var checkCmd = new SqlCommand("SELECT 1 FROM Client_Trip where IdClient=@IdClient and IdTrip=@IdTrip;", sqlConnection))
             {
                 checkCmd.Parameters.AddWithValue("@IdClient", id);
@@ -180,7 +183,7 @@ public class ClientsService : IClientsService
                     }
                 }
             }
-
+            //To zapytanie usuwa rekord z tabeli Client_Trip (czyli usuwa rejestracje klienta z wycieczki)
             using (var deleteCmd = new SqlCommand("DELETE CLIENT_TRIP WHERE IdClient=@IdClient AND IdTrip=@IdTrip", sqlConnection))
                 {
                     deleteCmd.Parameters.AddWithValue("@IdClient", id);

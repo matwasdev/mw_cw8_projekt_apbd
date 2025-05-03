@@ -15,6 +15,8 @@ public class TripsController : ControllerBase
     }
     
 
+    // Ten endpoint pobiera wszystkie dostepne wycieczki oraz podstawowe informacje o nich.
+    // Dodatkowo zwracamy rowniez DTO krajów dla kazdej wycieczki.
     [HttpGet]
     public async Task<ActionResult> GetTripsAsync()
     {
